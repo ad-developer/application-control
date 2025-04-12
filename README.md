@@ -1,3 +1,5 @@
+[![.NET](https://github.com/ad-developer/email-queue/actions/workflows/dotnet.yml/badge.svg)](https://github.com/ad-developer/application-control/actions/workflows/dotnet.yml)
+
 # Application Control
 
 Application Control is a system designed to act as a single application command system. It allows users to run commands as an administrator or as a centralized system to execute administrative commands on any application registered within the system.
