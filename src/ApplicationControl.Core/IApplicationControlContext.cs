@@ -5,5 +5,5 @@ namespace ApplicationControl.Core;
 
 public interface IApplicationControlContext : IContext
 {
-     DbSet<ApplicationControl> ApplicationControls { get; set; }
+     DbSet<CommandQueueItem> CommandQueueItems { get; set; }
 }

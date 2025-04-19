@@ -4,8 +4,8 @@ using ApplicationControl.Core.Common;
 
 namespace ApplicationControl.Core;
 
-[Table("ApplicationControl", Schema = "AppControl")]
-public class ApplicationControl : IEntity<Guid>
+[Table("CommandQueueItem", Schema = "ApplicationControl")]
+public class CommandQueueItem : IEntity<Guid>
 {
     [Key]
     public Guid Id { get; set; }

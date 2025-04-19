@@ -5,7 +5,7 @@ namespace ApplicationControl.Core;
 
 public interface IApplicationControlService
 {
-    Task<ApplicationControl?> GetNextCommandAsync(Guid applicationId, CancellationToken cancellationToken);
-    Task SetCommandStatusAsync(Guid applicationId, Guid commandId, string setBy, CommandStatus commandStatus, string message, CancellationToken cancellationToken);
-    Task<ApplicationControl> QueueCommandAsync(Guid applicaitonId, string command,  string addedBy, CancellationToken cancellationToken);
+    Task<CommandQueueItem?> GetNextCommandAsync(Guid applicationId, CancellationToken cancellationToken = default);
+    Task SetCommandStatusAsync(Guid applicationId, Guid commandId, string setBy, CommandStatus commandStatus, string message, CancellationToken cancellationToken = default); 
+    Task<CommandQueueItem> QueueCommandAsync(Guid applicaitonId, string command,  string addedBy, CancellationToken cancellationToken = default);
 }

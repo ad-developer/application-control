@@ -1,8 +1,20 @@
-var builder = WebApplication.CreateBuilder(args);
+using ApplicationControl.Core;
+using ApplicationControl.Core.Configuration;
+using ApplicationControl.Core.Common;
+using Scalar.AspNetCore;
 
+var builder = WebApplication.CreateBuilder(args);
+builder.ConfigureApplicationControlCoreService(options =>
+{
+    options.ConnectionName = "ApplicationControlDb";
+});
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// Services
+
+
 
 var app = builder.Build();
 
@@ -10,36 +22,35 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+        {
+            options.WithTitle("Application Control WebAPI")
+                .WithTheme(ScalarTheme.Mars)
+                .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+                
+        });
 }
 
 app.UseHttpsRedirection();
 
-app.MapGet("/getnextcommand", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+app.MapGet("/getnextcommand", async (Guid applicationId, IApplicationControlService service) =>
+{ 
+    var command = await service.GetNextCommandAsync(applicationId);    
+    return Results.Ok(command);
 })
 .WithName("GetNextCommand");
 
-app.MapPost("/setstatus", (WeatherForecast forecast) =>
+app.MapPost("/setstatus", async (Guid applicaiotnId, Guid commandId, string setBy, CommandStatus status, string message, IApplicationControlService service) =>
 {
-    return Results.Ok(forecast);
+    await service.SetCommandStatusAsync(applicaiotnId, commandId, setBy, status, message);
 })
 .WithName("SetStatus");
 
-
-
+app.MapPost("/queuecommand", async (Guid applicaitonId, string command, string addedBy, IApplicationControlService service) =>
+{
+    var res = await service.QueueCommandAsync(applicaitonId, command, addedBy);
+    return Results.Ok(res);
+})
+.WithName("QueueCommand");
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

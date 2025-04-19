@@ -2,32 +2,32 @@ using ApplicationControl.Core.Common;
 
 namespace ApplicationControl.Core;
 
-public class ApplicationControlService(IApplicationControlRepository applicationControlRepository) : IApplicationControlService
+public class ApplicationControlService(ICommandQueueItemRepository commandQueueItemRepository) : IApplicationControlService
 {
-    private readonly IApplicationControlRepository _applicationControlRepository = applicationControlRepository;
+    private readonly ICommandQueueItemRepository _commandQueueItemRepository = commandQueueItemRepository;
 
-    public async Task<ApplicationControl> QueueCommandAsync(Guid applicaitonId, string command,  string addedBy, CancellationToken cancellationToken = default)
+    public async Task<CommandQueueItem> QueueCommandAsync(Guid applicaitonId, string command,  string addedBy, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrEmpty(applicaitonId.ToString(), nameof(applicaitonId));
         ArgumentException.ThrowIfNullOrEmpty(command, nameof(command));
         ArgumentException.ThrowIfNullOrEmpty(addedBy, nameof(addedBy));
         
-        var commandEntity = new ApplicationControl
+        var commandEntity = new CommandQueueItem
         {
             ApplicationId = applicaitonId,
             Command = command,
             Status = CommandStatus.Queued
         };
         
-        var res = await _applicationControlRepository.AddAsync(commandEntity, addedBy, cancellationToken);
+        var res = await _commandQueueItemRepository.AddAsync(commandEntity, addedBy, cancellationToken);
         return res;
     }
 
-    public async Task<ApplicationControl?> GetNextCommandAsync(Guid applicationId, CancellationToken cancellationToken)
+    public async Task<CommandQueueItem?> GetNextCommandAsync(Guid applicationId, CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrEmpty(applicationId.ToString(), nameof(applicationId));
 
-        var nextCommand = await _applicationControlRepository.GetNextCommandAsync(cancellationToken);
+        var nextCommand = await _commandQueueItemRepository.GetNextCommandAsync(cancellationToken);
 
         return nextCommand;
     }
@@ -40,7 +40,6 @@ public class ApplicationControlService(IApplicationControlRepository application
         ArgumentException.ThrowIfNullOrEmpty(message, nameof(message));
         ArgumentException.ThrowIfNullOrEmpty(commandStatus.ToString(), nameof(commandStatus));
 
-        await _applicationControlRepository.SetCommandStatusAsync(applicationId, commandId, setBy, commandStatus, message, cancellationToken);
+        await _commandQueueItemRepository.SetCommandStatusAsync(applicationId, commandId, setBy, commandStatus, message, cancellationToken);
     }
-    
 }

@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationControl.Core;
 
-public class ApplicationControlRepository(IApplicationControlContext context) : BaseRepository<ApplicationControl, Guid>(context), IApplicationControlRepository
+public class CommandQueueItemRepository(IApplicationControlContext context) : BaseRepository<CommandQueueItem, Guid>(context), ICommandQueueItemRepository
 {
-    public async Task<ApplicationControl?> GetNextCommandAsync(CancellationToken cancellationToken = default)
+    public async Task<CommandQueueItem?> GetNextCommandAsync(CancellationToken cancellationToken = default)
     {
           var nextCommand = 
               await  Entity
