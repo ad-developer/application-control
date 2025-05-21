@@ -6,16 +6,14 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 builder.ConfigureApplicationControlCoreService(options =>
 {
-    options.ConnectionName = "ApplicationControlDb";
+    options.ConnectionString = "ApplicationControlDb";
 });
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+
 // Services
-
-
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -33,24 +31,24 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/getnextcommand", async (Guid applicationId, IApplicationControlService service) =>
+app.MapGet("/getnextqueuedjob", async (Guid applicationId, IApplicationControlService service) =>
 { 
-    var command = await service.GetNextCommandAsync(applicationId);    
-    return Results.Ok(command);
+    var command = await service.GetQueuedJobAsync(applicationId);    
+    return TypedResults.Ok(command);
 })
-.WithName("GetNextCommand");
+.WithName("GetNextQueuedJob");
 
-app.MapPost("/setstatus", async (Guid applicaiotnId, Guid commandId, string setBy, CommandStatus status, string message, IApplicationControlService service) =>
+app.MapPost("/setquuedjobstatus", async (Guid applicaiotnId, Guid commandId, string setBy, QueuedJobStatus queuedJobStatus, string message, IApplicationControlService service) =>
 {
-    await service.SetCommandStatusAsync(applicaiotnId, commandId, setBy, status, message);
+    await service.SetQueuedJobStatusAsync(applicaiotnId, commandId, setBy, queuedJobStatus, message);
 })
-.WithName("SetStatus");
+.WithName("SetQueuedJobStatus");
 
-app.MapPost("/queuecommand", async (Guid applicaitonId, string command, string addedBy, IApplicationControlService service) =>
+app.MapPost("/queuequeuedjob", async (Guid applicaitonId, string command, string addedBy, IApplicationControlService service) =>
 {
-    var res = await service.QueueCommandAsync(applicaitonId, command, addedBy);
-    return Results.Ok(res);
+    var res = await service.QueueQueuedJobAsync(applicaitonId, command, addedBy);
+    return TypedResults.Ok(res);
 })
-.WithName("QueueCommand");
+.WithName("QueueQueuedJob");
 
 app.Run();

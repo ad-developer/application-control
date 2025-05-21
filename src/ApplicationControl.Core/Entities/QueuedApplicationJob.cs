@@ -2,10 +2,10 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using ApplicationControl.Core.Common;
 
-namespace ApplicationControl.Core;
+namespace ApplicationControl.Core.Entities;
 
-[Table("CommandQueueItem", Schema = "ApplicationControl")]
-public class CommandQueueItem : IEntity<Guid>
+[Table("QueuedApplicationJob", Schema = "ApplicationControl")]
+public class QueuedApplicationJob : IEntity<Guid>
 {
     [Key]
     public Guid Id { get; set; }
@@ -29,7 +29,7 @@ public class CommandQueueItem : IEntity<Guid>
     public string? UpdatedBy { get; set; }
 
     [Required]
-    public CommandStatus Status { get; set; } 
+    public QueuedJobStatus Status { get; set; } 
     public string? Message { get; set; }
     
     public bool IsDeleted { get; set; } = false;
