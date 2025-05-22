@@ -1,22 +1,23 @@
-using ApplicationControl.Core.Common;
+using ApplicationControl.Core.Entities;
+using ApplicationControl.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApplicationControl.Core;
+namespace ApplicationControl.Core.Respositories;
 
-public class ApplicationControlRepository(IApplicationControlContext context) : BaseRepository<ApplicationControl, Guid>(context), IApplicationControlRepository
+public class QueuedApplicationJobRepository(IApplicationControlContext context) : BaseRepository<QueuedApplicationJob, Guid>(context), IQueuedApplicationJobRepository
 {
-    public async Task<ApplicationControl?> GetNextCommandAsync(CancellationToken cancellationToken = default)
+    public async Task<QueuedApplicationJob?> GetNextJobAsync(CancellationToken cancellationToken = default)
     {
           var nextCommand = 
               await  Entity
-                        .Where(p => p.Status == CommandStatus.Queued)
+                        .Where(p => p.Status == JobStatus.Queued)
                         .OrderBy(p => p.AddedDateTime)
                         .SingleOrDefaultAsync(cancellationToken);
         
         return  nextCommand;
     }
 
-    public async Task SetCommandStatusAsync(Guid applicaitonId, Guid commandId, string setBy, CommandStatus commandStatus, string message, CancellationToken cancellationToken = default)
+    public async Task SetJobStatusAsync(Guid applicaitonId, Guid commandId, string setBy, JobStatus queuedJobStatus, string message, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrEmpty(setBy, nameof(setBy));
         
@@ -29,7 +30,7 @@ public class ApplicationControlRepository(IApplicationControlContext context) : 
             throw new InvalidOperationException($"Command with ID {commandId} and applicationId {applicaitonId} not found.");
         }
         
-        cmd.Status = commandStatus;
+        cmd.Status = queuedJobStatus;
         if(!string.IsNullOrEmpty(message))
         {
             cmd.Message = message;

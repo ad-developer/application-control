@@ -1,3 +1,4 @@
+using ApplicationControl.Core.Respositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,15 +17,15 @@ public static class ApplicationControlExtentions
         
         ApplicationControlOptions op = new();
         options(op);
-        ArgumentException.ThrowIfNullOrEmpty(op.ConnectionName, op.ConnectionName);
+        ArgumentException.ThrowIfNullOrEmpty(op.ConnectionString, op.ConnectionString);
 
         services.AddDbContext<ApplicationControlContext>(options=>{
             var connectionString =
-                builder.Configuration.GetConnectionString(op.ConnectionName);
+                builder.Configuration.GetConnectionString(op.ConnectionString);
             options.UseSqlServer(connectionString);
         });
         services.AddScoped<IApplicationControlContext, ApplicationControlContext>();
-        services.AddScoped<ICommandQueueItemRepository, CommandQueueItemRepository>();
+        services.AddScoped<IQueuedApplicationJobRepository, QueuedApplicationJobRepository>();
         services.AddScoped<IApplicationControlService,ApplicationControlService>();
     }
 }

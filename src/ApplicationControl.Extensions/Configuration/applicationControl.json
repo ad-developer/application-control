@@ -1,0 +1,5 @@
+{
+    "ApplicationControl" {
+        "APIURL": "https://api.example.com",
+    }
+}

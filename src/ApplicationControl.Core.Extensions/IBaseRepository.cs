@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace ApplicationControl.Core.Common;
+namespace ApplicationControl.Core.Extensions;
 
 public interface IBaseRepository<TEntity, TId> where TEntity : class
 {

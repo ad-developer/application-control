@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ApplicationControl.CommandProcessor.MicrosoftExtentionsDI;
+namespace ApplicationControl.CommandProcessor.Extensions;
 
 public static class ServiceCollectionExtensions
 {

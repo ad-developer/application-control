@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApplicationControl.Core.Common;
+namespace ApplicationControl.Core.Extensions;
 
 public abstract class BaseRepository<TEntity, TId>(IContext context) : IBaseRepository<TEntity, TId>, IDisposable 
                                         where TEntity : class, IEntity<TId> 

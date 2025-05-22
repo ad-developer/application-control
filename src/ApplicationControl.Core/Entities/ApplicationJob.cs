@@ -1,11 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using ApplicationControl.Core.Common;
+using ApplicationControl.Core.Extensions;
 
-namespace ApplicationControl.Core;
 
-[Table("ApplicationControl", Schema = "AppControl")]
-public class ApplicationControl : IEntity<Guid>
+namespace ApplicationControl.Core.Entities;
+
+[Table("ApplicationJob", Schema = "AppControl")]
+public class ApplicationJob : IEntity<Guid>
 {
     [Key]
     public Guid Id { get; set; }
@@ -28,9 +29,7 @@ public class ApplicationControl : IEntity<Guid>
 
     public string? UpdatedBy { get; set; }
 
-    [Required]
-    public CommandStatus Status { get; set; } 
-    public string? Message { get; set; }
+    public string? Description { get; set; }
     
     public bool IsDeleted { get; set; } = false;
 }
