@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace ApplicationControl.Core.Common;
+namespace ApplicationControl.Core.Extensions;
 
 public interface IContext
 {

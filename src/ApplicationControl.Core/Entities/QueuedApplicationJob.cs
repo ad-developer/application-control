@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using ApplicationControl.Core.Common;
+using ApplicationControl.Core.Extensions;
 
 namespace ApplicationControl.Core.Entities;
 
@@ -29,7 +29,7 @@ public class QueuedApplicationJob : IEntity<Guid>
     public string? UpdatedBy { get; set; }
 
     [Required]
-    public QueuedJobStatus Status { get; set; } 
+    public JobStatus Status { get; set; } 
     public string? Message { get; set; }
     
     public bool IsDeleted { get; set; } = false;

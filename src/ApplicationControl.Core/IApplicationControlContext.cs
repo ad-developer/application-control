@@ -1,5 +1,5 @@
-using ApplicationControl.Core.Common;
 using ApplicationControl.Core.Entities;
+using ApplicationControl.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationControl.Core;

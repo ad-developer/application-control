@@ -1,6 +1,6 @@
 using ApplicationControl.Core;
 using ApplicationControl.Core.Configuration;
-using ApplicationControl.Core.Common;
+using ApplicationControl.Core.Extensions;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,9 +38,9 @@ app.MapGet("/getnextqueuedjob", async (Guid applicationId, IApplicationControlSe
 })
 .WithName("GetNextQueuedJob");
 
-app.MapPost("/setquuedjobstatus", async (Guid applicaiotnId, Guid commandId, string setBy, QueuedJobStatus queuedJobStatus, string message, IApplicationControlService service) =>
+app.MapPost("/setquuedjobstatus", async (Guid applicaiotnId, Guid commandId, string setBy, JobStatus jobStatus, string message, IApplicationControlService service) =>
 {
-    await service.SetQueuedJobStatusAsync(applicaiotnId, commandId, setBy, queuedJobStatus, message);
+    await service.SetQueuedJobStatusAsync(applicaiotnId, commandId, setBy, jobStatus, message);
 })
 .WithName("SetQueuedJobStatus");
 

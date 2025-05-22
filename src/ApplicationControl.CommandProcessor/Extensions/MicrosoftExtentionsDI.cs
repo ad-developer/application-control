@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace ApplicationControl.CommandProcessor.MicrosoftExtentionsDI;
+namespace ApplicationControl.CommandProcessor.Extensions;
 
 public class CommandProcessorServiceConfiguration
 {

@@ -1,5 +1,5 @@
-using ApplicationControl.Core.Common;
 using ApplicationControl.Core.Entities;
+using ApplicationControl.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationControl.Core.Respositories;
@@ -10,14 +10,14 @@ public class QueuedApplicationJobRepository(IApplicationControlContext context) 
     {
           var nextCommand = 
               await  Entity
-                        .Where(p => p.Status == QueuedJobStatus.Queued)
+                        .Where(p => p.Status == JobStatus.Queued)
                         .OrderBy(p => p.AddedDateTime)
                         .SingleOrDefaultAsync(cancellationToken);
         
         return  nextCommand;
     }
 
-    public async Task SetJobStatusAsync(Guid applicaitonId, Guid commandId, string setBy, QueuedJobStatus queuedJobStatus, string message, CancellationToken cancellationToken = default)
+    public async Task SetJobStatusAsync(Guid applicaitonId, Guid commandId, string setBy, JobStatus queuedJobStatus, string message, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrEmpty(setBy, nameof(setBy));
         

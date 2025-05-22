@@ -1,5 +1,5 @@
-using ApplicationControl.Core.Common;
 using ApplicationControl.Core.Entities;
+using ApplicationControl.Core.Extensions;
 using ApplicationControl.Core.Respositories;
 
 namespace ApplicationControl.Core;
@@ -18,7 +18,7 @@ public class ApplicationControlService(IQueuedApplicationJobRepository queuedApp
         {
             ApplicationId = applicaitonId,
             Command = command,
-            Status = QueuedJobStatus.Queued
+            Status = JobStatus.Queued
         };
         
         var res = await _queuedApplicationJobRepository.AddAsync(applicationJob, addedBy, cancellationToken);
@@ -34,14 +34,14 @@ public class ApplicationControlService(IQueuedApplicationJobRepository queuedApp
         return nextCommand;
     }
 
-    public async Task SetQueuedJobStatusAsync(Guid applicationId, Guid commandId, string setBy, QueuedJobStatus queuedJobStatus, string message, CancellationToken cancellationToken)
+    public async Task SetQueuedJobStatusAsync(Guid applicationId, Guid commandId, string setBy, JobStatus jobStatus, string message, CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrEmpty(applicationId.ToString(), nameof(applicationId));
         ArgumentException.ThrowIfNullOrEmpty(commandId.ToString(), nameof(commandId));
         ArgumentException.ThrowIfNullOrEmpty(setBy, nameof(setBy));
         ArgumentException.ThrowIfNullOrEmpty(message, nameof(message));
-        ArgumentException.ThrowIfNullOrEmpty(queuedJobStatus.ToString(), nameof(queuedJobStatus));
+        ArgumentException.ThrowIfNullOrEmpty(jobStatus.ToString(), nameof(jobStatus));
 
-        await _queuedApplicationJobRepository.SetJobStatusAsync(applicationId, commandId, setBy, queuedJobStatus, message, cancellationToken);
+        await _queuedApplicationJobRepository.SetJobStatusAsync(applicationId, commandId, setBy, jobStatus, message, cancellationToken);
     }
 }

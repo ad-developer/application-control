@@ -7,4 +7,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.5" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ApplicationControl.CommandProcessor\ApplicationControl.CommandProcessor.csproj" />
+    <ProjectReference Include="..\ApplicationControl.Core.Extensions\ApplicationControl.Core.Extensions.csproj" />
+  </ItemGroup>
 </Project>

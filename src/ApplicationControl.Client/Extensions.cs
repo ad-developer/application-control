@@ -1,5 +1,5 @@
 namespace ApplicationControl.Client;
 
-public static class Extentions
+public static class Extensions
 {
 }
