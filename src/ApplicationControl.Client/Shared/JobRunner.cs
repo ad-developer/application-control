@@ -54,6 +54,11 @@ public class JobRunner : IJobRunner
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, $"Error executing job {job.Id} with command {job.Command}, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
+                        await _commandProcessor.PprocessAsync(job.Command);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error executing job");
                     }
                     finally
                     {
@@ -77,7 +82,7 @@ public class JobRunner : IJobRunner
         }
 
         await Task.WhenAll(tasks);
-        
+         
          _logger.LogInformation($"JobRunner completed, jobRunnerId {jobRunnerId}, time {DateTime.UtcNow}");
     }
 }
