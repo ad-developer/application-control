@@ -37,47 +37,34 @@ public class JobRunner : IJobRunner
         foreach (var job in jobs)
         {
             _semaphore.Wait(cancellationToken);
-
-            try
+            
+            // Run the job asynchronously
+            var task = Task.Run(async () =>
             {
-                // Run the job asynchronously
-                var task = Task.Run(async () =>
+                try
                 {
-                    try
-                    {
-                        _logger.LogInformation($"Executing job {job.Id} with command {job.Command}, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
+                    _logger.LogInformation($"Executing job {job.Id} with command {job.Command}, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
 
-                        await _commandProcessor.PprocessAsync(job.Command);
+                    await _commandProcessor.PprocessAsync(job.Command);
 
-                        _logger.LogInformation($"Job {job.Id} with command {job.Command} executed successfully, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, $"Error executing job {job.Id} with command {job.Command}, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
-                    }  
-                    finally
-                    {
-                        // Release the semaphore when the job is done
-                        _semaphore.Release();
-                    }
-                }, cancellationToken);
+                    _logger.LogInformation($"Job {job.Id} with command {job.Command} executed successfully, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error executing job {job.Id} with command {job.Command}, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
+                }  
+                finally
+                {
+                    // Release the semaphore when the job is done
+                    _semaphore.Release();
+                }
+            }, cancellationToken);
 
-                tasks.Add(task);
-            }
-            catch (Exception ex)
-            {
-                // Handle exceptions as needed
-                _logger.LogError(ex, $"Error executing jobs, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
-            }
-            finally
-            {
-                // Ensure the semaphore is released even if an exception occurs
-                _semaphore.Release();
-            }
+            tasks.Add(task);
         }
 
         await Task.WhenAll(tasks);
          
-         _logger.LogInformation($"JobRunner completed, jobRunnerId {jobRunnerId}, time {DateTime.UtcNow}");
+        _logger.LogInformation($"JobRunner completed, jobRunnerId {jobRunnerId}, time {DateTime.UtcNow}");
     }
 }
