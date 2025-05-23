@@ -29,8 +29,10 @@ public class JobRunner : IJobRunner
     public async Task RunJobAsync(List<IJob> jobs, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(jobs, nameof(jobs));
-     
+
         var tasks = new List<Task>();
+        var jobRunnerId = Guid.NewGuid();
+        _logger.LogInformation($"JobRunner started, tatal jobs number {jobs.Count},  jobRunnerId {jobRunnerId}, time {DateTime.UtcNow}");
 
         foreach (var job in jobs)
         {
@@ -43,11 +45,15 @@ public class JobRunner : IJobRunner
                 {
                     try
                     {
+                        _logger.LogInformation($"Executing job {job.Id} with command {job.Command}, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
+
                         await _commandProcessor.PprocessAsync(job.Command);
+
+                        _logger.LogInformation($"Job {job.Id} with command {job.Command} executed successfully, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Error executing job");
+                        _logger.LogError(ex, $"Error executing job {job.Id} with command {job.Command}, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
                     }
                     finally
                     {
@@ -61,7 +67,7 @@ public class JobRunner : IJobRunner
             catch (Exception ex)
             {
                 // Handle exceptions as needed
-                _logger.LogError(ex, "Error executing jobs");
+                _logger.LogError(ex, $"Error executing jobs, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
             }
             finally
             {
@@ -71,5 +77,7 @@ public class JobRunner : IJobRunner
         }
 
         await Task.WhenAll(tasks);
+        
+         _logger.LogInformation($"JobRunner completed, jobRunnerId {jobRunnerId}, time {DateTime.UtcNow}");
     }
 }
