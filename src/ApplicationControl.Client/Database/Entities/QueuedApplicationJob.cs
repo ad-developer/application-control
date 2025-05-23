@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using ApplicationControl.Core.Extensions;
 
-namespace ApplicationControl.Core.Entities;
+namespace ApplicationControl.Client.Database.Entities;
 
 [Table("QueuedApplicationJob", Schema = "ApplicationControl")]
 public class QueuedApplicationJob : IEntity<Guid>, IJob
@@ -34,3 +34,4 @@ public class QueuedApplicationJob : IEntity<Guid>, IJob
     
     public bool IsDeleted { get; set; } = false;
 }
+
