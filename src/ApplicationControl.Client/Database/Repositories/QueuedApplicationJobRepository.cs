@@ -10,7 +10,7 @@ public class QueuedApplicationJobRepository(IApplicationControlContext context) 
     {
         var commandList = 
               await  Entity
-                        .Where(p => p.Status == JobStatus.Queued)
+                        .Where(p => p.Status == JobStatus.Queued && p.IsDeleted == false)
                         .OrderBy(p => p.AddedDateTime)
                         .ToListAsync<IJob>(cancellationToken);
         
@@ -25,7 +25,7 @@ public class QueuedApplicationJobRepository(IApplicationControlContext context) 
                 .SingleOrDefaultAsync(cancellationToken);
             
         if (cmd is null)
-            throw new Exception($"Job Id {jobId} with applicationId {applicaitonId} not found.");
+            throw new Exception($"QueuedApplicationJobRepository, Job Id {jobId} with applicationId {applicaitonId} not found.");
         
         
         cmd.Status = queuedJobStatus;

@@ -1,7 +1,10 @@
 
+using ApplicationControl.Client.Configuration;
+using ApplicationControl.Client.Database.Repositories;
 using ApplicationControl.CommandProcessor;
 using ApplicationControl.Core.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace ApplicationControl.Client.Shared;
 
@@ -10,18 +13,29 @@ public class JobRunner : IJobRunner
     private readonly SemaphoreSlim _semaphore;
     private readonly ILogger<JobRunner> _logger;
     private readonly ICommandProcessor _commandProcessor;
+    private readonly IQueuedApplicationJobRepository _queuedApplicationJobRepository;
 
-    public JobRunner(ILogger<JobRunner> logger, ICommandProcessor commandProcessor)
+    private readonly ApplicationControlOptions _options;
+
+    public JobRunner(ILogger<JobRunner> logger, ICommandProcessor commandProcessor, IQueuedApplicationJobRepository queuedApplicationJobRepository, IOptions<ApplicationControlOptions> options)
     {
         ArgumentNullException.ThrowIfNull(commandProcessor, nameof(commandProcessor));
         ArgumentNullException.ThrowIfNull(logger, nameof(logger));
- 
+        ArgumentNullException.ThrowIfNull(queuedApplicationJobRepository, nameof(queuedApplicationJobRepository));
+        ArgumentNullException.ThrowIfNull(options, nameof(options));
+
         // Initialize the logger
         _logger = logger;
 
         // Initialize the logger and command processor
         _commandProcessor = commandProcessor;
-    
+
+        // Initialize the queued application job repository
+        _queuedApplicationJobRepository = queuedApplicationJobRepository;
+
+        // Initialize the options
+        _options = options.Value;
+
         // Initialize the semaphore with a maximum count of 10
         _semaphore = new SemaphoreSlim(10);
     }
@@ -43,14 +57,24 @@ public class JobRunner : IJobRunner
             {
                 try
                 {
+                    await _queuedApplicationJobRepository.SetJobStatusAsync(_options.ApplicaitonId, job.Id, "Job Runner", JobStatus.InProgress, null, cancellationToken)
+                        .ConfigureAwait(false);
+
                     _logger.LogInformation($"Executing job {job.Id} with command {job.Command}, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
 
-                    await _commandProcessor.PprocessAsync(job.Command);
+                    await _commandProcessor.PprocessAsync(job.Command)
+                        .ConfigureAwait(false);
+
+                    await _queuedApplicationJobRepository.SetJobStatusAsync(_options.ApplicaitonId, job.Id, "Job Runner", JobStatus.Completed, null, cancellationToken)
+                        .ConfigureAwait(false);
 
                     _logger.LogInformation($"Job {job.Id} with command {job.Command} executed successfully, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
                 }
                 catch (Exception ex)
                 {
+                    await _queuedApplicationJobRepository.SetJobStatusAsync(_options.ApplicaitonId, job.Id, "Job Runner", JobStatus.Failed, ex.Message, cancellationToken)
+                        .ConfigureAwait(false);
+
                     _logger.LogError(ex, $"Error executing job {job.Id} with command {job.Command}, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
                 }  
                 finally

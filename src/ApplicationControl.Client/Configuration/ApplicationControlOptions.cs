@@ -1,6 +1,6 @@
 namespace ApplicationControl.Client.Configuration;
 
-public class Settings
+public class ApplicationControlOptions
 {
     public string? ConnectionString { get; set; }
 
