@@ -13,8 +13,6 @@ public class QueuedApplicationJob : IEntity<Guid>, IJob
     [Required]
     public required string Command { get; set; }
     
-    public  string ApplicationName { get; set; } = "Not Available";
-    
     [Required]
     public required Guid ApplicationId { get; set; }
 

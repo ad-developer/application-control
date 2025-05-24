@@ -7,10 +7,10 @@ using Microsoft.Extensions.Options;
 
 namespace ApplicationControl.Client.Database.hostedServices;
 
-public class DatabaseQueuedJobHostedService(IServiceProvider services, ILogger<DatabaseQueuedJobHostedService> logger, IOptions<Settings> options) : BackgroundService
+public class DatabaseQueuedJobHostedService(IServiceProvider services, ILogger<DatabaseQueuedJobHostedService> logger, IOptions<ApplicationControlOptions> options) : BackgroundService
 {
     private readonly ILogger<DatabaseQueuedJobHostedService> _logger = logger;
-    private readonly Settings _options = options.Value;
+    private readonly ApplicationControlOptions _options = options.Value;
     public IServiceProvider Services { get; } = services;
     Guid _processId = Guid.NewGuid();
     
