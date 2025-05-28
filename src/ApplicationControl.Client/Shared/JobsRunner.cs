@@ -58,7 +58,7 @@ public class JobsRunner : IJobsRunner
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"Error executing job worker for jobId {job.Id}, command {job.Command}, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
+                    _logger.LogError(ex, $"Error executing job worker, jobId {job.Id}, command {job.Command}, jobRunnerId {jobRunnerId}, datetime {DateTime.UtcNow}");
                 }
                 finally
                 {
