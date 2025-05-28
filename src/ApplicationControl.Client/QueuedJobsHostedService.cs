@@ -1,15 +1,15 @@
 using ApplicationControl.Client.Configuration;
-using ApplicationControl.Client.Database.HostedServices;
+using ApplicationControl.Client.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace ApplicationControl.Client.Database.hostedServices;
+namespace ApplicationControl.Client;
 
-public class DatabaseQueuedJobHostedService(IServiceProvider services, ILogger<DatabaseQueuedJobHostedService> logger, IOptions<ApplicationControlOptions> options) : BackgroundService
+public class QueuedJobsHostedService(IServiceProvider services, ILogger<QueuedJobsHostedService> logger, IOptions<ApplicationControlOptions> options) : BackgroundService
 {
-    private readonly ILogger<DatabaseQueuedJobHostedService> _logger = logger;
+    private readonly ILogger<QueuedJobsHostedService> _logger = logger;
     private readonly ApplicationControlOptions _options = options.Value;
     public IServiceProvider Services { get; } = services;
     Guid _processId = Guid.NewGuid();
@@ -25,7 +25,7 @@ public class DatabaseQueuedJobHostedService(IServiceProvider services, ILogger<D
             catch (Exception ex)
             {
                 var delayInSeconds = _options.QueuedHastedServiceResetProcessCycle * 1000;
-                _logger.LogError(ex, $"An error occurred while executing the DatabaseQueuedJobHostedService. Service will be restarted in {delayInSeconds} seconds.");
+                _logger.LogError(ex, $"An error occurred while executing the QueuedJobsHostedService. Service will be restarted in {delayInSeconds} seconds.");
                 
                 Task.Delay(delayInSeconds, stoppingToken).Wait(stoppingToken);
             }
@@ -33,7 +33,7 @@ public class DatabaseQueuedJobHostedService(IServiceProvider services, ILogger<D
     }
     internal async Task DoWorkAsync(CancellationToken cancellationToken)
     {
-         _logger.LogInformation($"QueueProcessingHostedService started, process id {_processId}, time {DateTime.UtcNow}"); 
+         _logger.LogInformation($"QueuedJobsHostedService started, process id {_processId}, datetime {DateTime.UtcNow}"); 
         int cycleCount = 0;
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -43,15 +43,15 @@ public class DatabaseQueuedJobHostedService(IServiceProvider services, ILogger<D
             {
                 using (var scope = Services.CreateScope())
                 {
-                    _logger.LogInformation($"QueueProcessingHostedService started new cycle, number {cycleCount}, process id {_processId}, scope id {cycleId}, ime {DateTime.UtcNow}");
+                    _logger.LogInformation($"QueuedJobsHostedService started new cycle, number {cycleCount}, process id {_processId}, cycle id {cycleId}, datetime {DateTime.UtcNow}");
 
-                    var worker =
+                    var listner =
                         scope.ServiceProvider
-                            .GetRequiredService<IDatabaseQueuedJobWorker>();
+                            .GetRequiredService<IJobsListener>();
 
-                    await worker.DoWorkAsync(cancellationToken);
+                    await listner.ListenAsync(cancellationToken);
 
-                    _logger.LogInformation($"QueueProcessingHostedService completed new cycle, number {cycleCount}, process id {_processId}, scope id {cycleId}, time {DateTime.UtcNow}");
+                    _logger.LogInformation($"QueuedJobsHostedService completed new cycle, number {cycleCount}, process id {_processId}, cycle id {cycleId}, datetime {DateTime.UtcNow}");
                 }
 
                 var delayInSeconds = _options.QueuedHastedServiceCycle * 1000;
@@ -60,7 +60,7 @@ public class DatabaseQueuedJobHostedService(IServiceProvider services, ILogger<D
             catch (Exception ex)
             {
                 var delayInSeconds = _options.QueuedHastedResetServiceCycle * 1000;
-                _logger.LogError(ex, $"QueueProcessingHostedService failed cycle, number {cycleCount}, process id {_processId}, scope id {cycleId}, time {DateTime.UtcNow}. Cycle will be restarted in {delayInSeconds} seconds.");
+                _logger.LogError(ex, $"QueuedJobsHostedService failed, cycle number {cycleCount}, process id {_processId}, cycle id {cycleId}, datetime {DateTime.UtcNow}. Cycle will restart in {delayInSeconds} seconds.");
 
                 await Task.Delay(delayInSeconds, cancellationToken);
             }
@@ -68,7 +68,7 @@ public class DatabaseQueuedJobHostedService(IServiceProvider services, ILogger<D
     }
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"QueueProcessingHostedService is stopping, process id {_processId} time {DateTime.UtcNow}");
+        _logger.LogInformation($"QueuedJobsHostedService is stopping, process id {_processId} datetime {DateTime.UtcNow}");
         await base.StopAsync(cancellationToken);
     }
 }

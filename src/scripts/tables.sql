@@ -49,7 +49,7 @@ go
 
 if OBJECT_ID('ApplicationControl.QueuedApplicationJob', 'U') is  null
 begin   
-    create table ApplicationControl.CommandQueueItem (
+    create table ApplicationControl.QueuedApplicationJob (
         Id UNIQUEIDENTIFIER DEFAULT NEWID() not null,
         Command   VARCHAR(512) not null,
         ApplicationName   VARCHAR(512)  null,
@@ -68,7 +68,7 @@ end
 go
 if OBJECT_ID('ApplicationControl.ScheduledApplicationJob', 'U') is  null
 begin   
-    create table ApplicationControl.CommandQueueItem (
+    create table ApplicationControl.ScheduledApplicationJob (
         Id UNIQUEIDENTIFIER DEFAULT NEWID() not null,
         Command   VARCHAR(512) not null,
         ApplicationName   VARCHAR(512)  null,
