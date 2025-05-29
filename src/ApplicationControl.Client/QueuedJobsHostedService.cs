@@ -22,11 +22,16 @@ public class QueuedJobsHostedService(IServiceProvider services, ILogger<QueuedJo
             {
                 await DoWorkAsync(stoppingToken);
             }
+            catch (TaskCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                _logger.LogInformation("QueuedJobsHostedService stopping, cancellation requested ...");
+                 break;
+            }
             catch (Exception ex)
             {
                 var delayInSeconds = _options.QueuedHastedServiceResetProcessCycle * 1000;
                 _logger.LogError(ex, $"An error occurred while executing the QueuedJobsHostedService. Service will be restarted in {delayInSeconds} seconds.");
-                
+
                 Task.Delay(delayInSeconds, stoppingToken).Wait(stoppingToken);
             }
         }
