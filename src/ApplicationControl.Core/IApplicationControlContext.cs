@@ -7,4 +7,5 @@ namespace ApplicationControl.Core;
 public interface IApplicationControlContext : IContext
 {
      DbSet<QueuedApplicationJob> QueuedApplicationJobs { get; set; }
+     DbSet<ScheduledApplicationJob> ScheduledApplicationJobs { get; set; }
 }

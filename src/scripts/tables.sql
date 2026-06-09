@@ -67,19 +67,24 @@ end
 
 go
 if OBJECT_ID('ApplicationControl.ScheduledApplicationJob', 'U') is  null
-begin   
-    create table ApplicationControl.ScheduledApplicationJob (
-        Id UNIQUEIDENTIFIER DEFAULT NEWID() not null,
-        Command   VARCHAR(512) not null,
-        ApplicationName   VARCHAR(512)  null,
-        ApplicationId   UNIQUEIDENTIFIER  not null,
-        AddedDateTime DATETIME DEFAULT GETDATE(),
-        AddedBy VARCHAR(255) NOT NULL,
-        UpdatedDateTime DATETIME null,
-        UpdatedBy VARCHAR(255) null,
-        [Status] int not null default 0,
-        [Message] VARCHAR(MAX) null, 
-        [IsDeleted] bit null default 0, 
-        CONSTRAINT [PK_ScheduledApplicationJob_Id] PRIMARY KEY CLUSTERED ([Id] ASC)
-    )
-end
+CREATE TABLE ApplicationControl.ScheduledApplicationJob (
+    Id UNIQUEIDENTIFIER IDENTITY PRIMARY KEY,
+    JobName NVARCHAR(100) NOT NULL,
+    ScheduledTime DATETIME NOT NULL,
+    IsExecuted BIT DEFAULT 0,
+    IsRecurring BIT DEFAULT 0,
+    IntervalMinutes INT NULL,
+    CronExpression NVARCHAR(100) NULL,
+    Command NVARCHAR(255) NULL,
+    LastRunTime DATETIME NULL,
+    RunIfMissed BIT DEFAULT 1,       -- NEW: catch-up support
+    
+    ApplicationId   UNIQUEIDENTIFIER  not null,
+    AddedDateTime DATETIME DEFAULT GETDATE(),
+    AddedBy VARCHAR(255) NOT NULL,
+    UpdatedDateTime DATETIME null,
+    UpdatedBy VARCHAR(255) null,
+    
+    [Description] VARCHAR(100) null, 
+    [IsDeleted] bit null default 0, 
+);
